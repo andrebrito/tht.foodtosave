@@ -28,9 +28,9 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    @Cacheable(value = "person")
+    @Cacheable(value = "personList")
     public List<PersonRecord> findAll() {
-        this.LOGGER.info("Querying database...");
+        this.LOGGER.info("Querying database through findAll...");
 
         final List<Person> records = this.personRepository.findAll();
         return records.stream()
@@ -40,7 +40,10 @@ public class PersonService {
                       .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "person", key = "#id")
     public PersonRecord findById(Long id) {
+        this.LOGGER.info("Querying database for a single person...");
+
         final Optional<Person> optionalPerson = this.personRepository.findById(id);
 
         if (optionalPerson.isEmpty()) {
@@ -51,17 +54,17 @@ public class PersonService {
         return new PersonRecord(person.getId(), person.getName(), this.formatDateTime(person.getCreatedAt()));
     }
 
-    @CacheEvict(value = "person", allEntries = true)
+    @CacheEvict(value = "personList", allEntries = true)
     public boolean create(PersonDto personDto) {
         return this.personRepository.create(personDto);
     }
 
-    @CacheEvict(value = "person", allEntries = true)
+    @CacheEvict(value = "personList", allEntries = true)
     public boolean deleteAll() {
         return this.personRepository.deleteAll();
     }
 
-    @CacheEvict(value = "person", allEntries = true)
+    @CacheEvict(value = "person", key = "#id")
     public boolean deleteById(Long id) {
         return this.personRepository.deleteById(id);
     }
