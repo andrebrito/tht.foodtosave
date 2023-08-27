@@ -4,18 +4,72 @@
 
 ### Requisitos
 1. Construir um serviço usando Spring Boot e Docker. :white_check_mark:
-2. Conectar-se a um banco de dados relacional usando o JdbcTemplate.
-3. Conectar-se a um servidor Redis.
-4. Implementar uma API que retorne um objeto simples e utilize o Redis como cache.
-5. O cache deve ter um TTL de 10 segundos.
-6. O serviço deve ir ao banco de dados apenas na primeira requisição dentro desse intervalo de tempo, caso a resposta não seja nula.
-7. Colocar ao menos um teste de integração que valide a API.
-8. É importante fornecer uma visibilidade do tempo gasto na construção.
-9. O serviço deverá ser executado usando docker e subindo todas as suas sub-dependências.
+2. Conectar-se a um banco de dados relacional usando o JdbcTemplate. :white_check_mark:
+3. Conectar-se a um servidor Redis. :white_check_mark:
+4. Implementar uma API que retorne um objeto simples e utilize o Redis como cache. :white_check_mark:
+5. O cache deve ter um TTL de 10 segundos. :white_check_mark:
+6. O serviço deve ir ao banco de dados apenas na primeira requisição dentro desse intervalo de tempo, caso a resposta não seja nula. :white_check_mark:
+7. Colocar ao menos um teste de integração que valide a API. :white_check_mark:
+8. É importante fornecer uma visibilidade do tempo gasto na construção. :white_check_mark:
+9. O serviço deverá ser executado usando docker e subindo todas as suas sub-dependências. :no_entry_sign:
 
 ### Opcional
-- Colocar um readme para explicar como subir o serviço.
+- Colocar um readme para explicar como subir o serviço. :white_check_mark:
 - Repetir a montagem do serviço, seguindo os mesmos critérios, substituindo a
-linguagem Java por outra de sua escolha.
+linguagem Java por outra de sua escolha. :no_entry_sign:
+
+### Detalhes para execução
+- Há 2 arquivos `docker-compose`:
+    - O arquivo com sufixo `-dev` é usado para desenvolvimento, ou seja, executa-se ele e, posteriormente, o `FoodToSaveApplication` via IDE ou `mvnw`;
+    - O arquivo sem sufixo será usado após o build da imagem da aplicação via Dockerfile;
+    - Ambos os arquivos contém a inicialização do Postgres e do Redis.
+- `Dockerfile` será usado para o build da imagem via linha de comando:
+    - Na raiz do projeto, executar `docker build -t foodtosave .`;
+    - Executar o `docker-compose.yml` (pela IDE ou pela linha de comando):
+      - `docker-compose up`
+
+### Aplicação
+- A aplicação é bastante simples:
+  - Há um modelo, `person`, com 3 colunas: `id`, `name` e `created_at`;
+  - Há um endpoint implementado, com os seguintes métodos HTTP:
+    - `POST /person`, onde um JSON com o atributo `name` deve ser enviado com algum conteúdo texto;
+    - `GET /person`, pelo qual será retornada lista com todos os registros persistidos (ou uma lista vazia);
+    - `GET /person/:id`, endpoint para consultar um registro pelo id;
+    - `DELETE /person`, para remover todas os regitros;
+    - `DELETE /person/:id`, para remover registro específico.
+  - Os endpoints de acesso (`GET`) fazem a leitura do(s) registro(s) do banco de dados;
+  - Caso seja feita a mesma requisição antes dos 10 segundos seguintes, a consulta acontece no Redis;
+  - Caso sejam realizadas requisições que alteram o modelo (`POST` ou `DELETE`), há o cache evict no Redis e as próximas consultas serão realizadas no Postgres.
+
+### Testes Automatizados
+- Para execução dos testes, foram utilizados:
+    - JUnit + Mockito;
+    - H2;
+    - embedded-redis.
+- Foram implementados diferentes tipos de testes:
+    - Para o Service, o teste é estritamente unitário;
+    - Para o Repository, usamos o H2 como banco de dados em memória;
+    - Para o Controller e e2e usamos todo o conjunto.
+- O teste e2e carece de algumas melhorias:
+    - O interessante seria termos um arquivo seed, com a persistência de alguns registros para usarmos nos testes;
+    - Optou-se por não seguir o caminho acima pelo tempo proposto por mim.
+
+### Postgres & Flyway
+- Inicialmente, havia pensado em implementar a solução usando algum banco de dados mais prático e leve, como  SQLite. No entanto, notaram-se algumas incompatibilidades na execução das migrations com o H2. Dessa forma, foi usado Postgres pois não há incompabilidades significativas entre ele e o H2;
+- Configurações via env:
+  - `DATABASE_HOST` (com a porta).
+
+### Redis Cache
+- Foi utilizado Redis como estratégia de cache, usufruindo algumas estratégias já implementadas no Spring (`@EnableCaching`);
+- Caso seja necessária implementação mais controlada, posso alterar a implementação;
+- Configurações via env:
+  - `REDIS_HOST`;
+  - `REDIS_PORT`;
+  - `REDIS_PASSWORD`;
+  - `REDIS_TTL`.
+
+
+
+
 
 
