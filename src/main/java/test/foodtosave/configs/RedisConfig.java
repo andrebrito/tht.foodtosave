@@ -2,6 +2,7 @@ package test.foodtosave.configs;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +15,10 @@ import java.time.Duration;
 
 @EnableCaching
 @Configuration
+@ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig {
 
-    private final Long DEFAULT_TTL = 10L;
+    private final Long DEFAULT_TTL = 7L;
 
     @Autowired
     private Environment environment;

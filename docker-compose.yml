@@ -14,3 +14,15 @@ services:
     image: redis:6
     ports:
       - '6379:6379'
+  api:
+    container_name: foodtosave-api
+    image: foodtosave
+    depends_on: [ postgres, redis ]
+    environment:
+      - 'DATABASE_HOST=postgres'
+      - 'REDIS_HOST=redis'
+      - 'REDIS_PORT=6379'
+      - 'REDIS_PASSWORD=password'
+      - 'REDIS_TTL=10'
+    ports:
+      - '8080:8080'
