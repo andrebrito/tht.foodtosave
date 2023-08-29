@@ -15,8 +15,8 @@
 
 ### Opcional
 - Colocar um readme para explicar como subir o serviço. :white_check_mark:
-- Repetir a montagem do serviço, seguindo os mesmos critérios, substituindo a
-linguagem Java por outra de sua escolha. :no_entry_sign:
+- Repetir a montagem do serviço, seguindo os mesmos critérios, substituindo a linguagem Java por outra de sua escolha.
+		- [Link para o projeto em NestJS](https://github.com/andrebrito/tht.foodtosave.nestjs).
 
 ### Detalhes para execução
 - Há 2 arquivos `docker-compose`:
