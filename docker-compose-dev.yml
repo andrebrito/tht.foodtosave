@@ -11,6 +11,6 @@ services:
       - '5431:5432'
   redis:
     container_name: redis
-    image: redis:6
+    image: redis:7
     ports:
       - '6379:6379'
